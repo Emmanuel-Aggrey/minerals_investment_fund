@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Reports | MIIF Visitor Management{% endblock %}
+{% block content %}
+<h2>Visitor Reports</h2>
+<form class="card" method="get">
+  <div class="form-grid">
+    <div>
+      <label for="q">Search</label>
+      <input id="q" name="q" value="{{ filters.q }}" placeholder="Name, reference, or person visited">
+    </div>
+    <div>
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">All</option>
+        <option value="checked_in" {% if filters.status == "checked_in" %}selected{% endif %}>Checked in</option>
+        <option value="checked_out" {% if filters.status == "checked_out" %}selected{% endif %}>Checked out</option>
+      </select>
+    </div>
+    <div>
+      <label for="date_from">From</label>
+      <input id="date_from" type="date" name="date_from" value="{{ filters.date_from }}">
+    </div>
+    <div>
+      <label for="date_to">To</label>
+      <input id="date_to" type="date" name="date_to" value="{{ filters.date_to }}">
+    </div>
+    <div>
+      <label for="purpose">Purpose</label>
+      <select id="purpose" name="purpose">
+        <option value="">All purposes</option>
+        {% for value, label in purposes %}
+        <option value="{{ value }}" {% if filters.purpose == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="department">Department</label>
+      <select id="department" name="department">
+        <option value="">All departments</option>
+        {% for department in departments %}
+        <option value="{{ department.pk }}" {% if filters.department == department.pk|stringformat:"s" %}selected{% endif %}>{{ department.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-gold" type="submit">Apply Filters</button>
+    <a class="btn btn-light" href="{% url 'visitor:reports' %}">Reset</a>
+    <a class="btn btn-dark" href="{% url 'visitor:export_pdf' %}?{{ request.GET.urlencode }}">Download PDF</a>
+    <a class="btn btn-dark" href="{% url 'visitor:export_excel' %}?{{ request.GET.urlencode }}">Download Excel</a>
+  </div>
+</form>
+
+<section class="card">
+  <div class="actions" style="justify-content: space-between; margin-top: 0;">
+    <h3>Records</h3>
+    <span class="muted">{{ total_records }} total; showing first 200</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Reference</th><th>Visitor</th><th>Phone</th><th>Person Visited</th><th>Department</th><th>Purpose</th><th>Entry</th><th>Exit</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for visitor in records %}
+      <tr>
+        <td>{{ visitor.reference_number }}</td>
+        <td>{{ visitor.full_name }}</td>
+        <td>{{ visitor.phone }}</td>
+        <td>{{ visitor.person_visited_name }}</td>
+        <td>{{ visitor.department_name }}</td>
+        <td>{{ visitor.purpose }}</td>
+        <td>{{ visitor.entry_time|date:"Y-m-d H:i" }}</td>
+        <td>{{ visitor.exit_time|date:"Y-m-d H:i"|default:"In progress" }}</td>
+        <td><a class="btn btn-dark btn-sm" href="{% url 'visitor:visitor_detail' visitor.pk %}">Open</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="9" class="muted">No records match these filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

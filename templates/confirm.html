@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Registration Confirmed | MIIF Visitor Management{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Registration Confirmed</h2>
+  <p class="muted">Reference number</p>
+  <p style="font-size: 30px; font-weight: 700; margin: 6px 0 18px;">{{ visitor.reference_number }}</p>
+  <table>
+    <tr><th>Visitor</th><td>{{ visitor.full_name }}</td></tr>
+    <tr><th>Person Visited</th><td>{{ visitor.person_visited_name }}</td></tr>
+    <tr><th>Purpose</th><td>{{ visitor.purpose }}</td></tr>
+    <tr><th>Entry Time</th><td>{{ visitor.entry_time|date:"Y-m-d H:i" }}</td></tr>
+    <tr><th>Purge Date</th><td>{{ visitor.purge_date|date:"Y-m-d" }}</td></tr>
+  </table>
+  <div class="actions">
+    <a class="btn btn-dark" href="{% url 'visitor:visitor_detail' visitor.pk %}">View Record</a>
+    <a class="btn btn-gold" href="{% url 'visitor:register_visitor' %}">Register Another</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Record Exit | MIIF Visitor Management{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Record Exit</h2>
+  <p>Confirm departure for <strong>{{ visitor.full_name }}</strong>.</p>
+  <table style="margin-top: 16px;">
+    <tr><th>Reference</th><td>{{ visitor.reference_number }}</td></tr>
+    <tr><th>Entry Time</th><td>{{ visitor.entry_time|date:"Y-m-d H:i" }}</td></tr>
+    <tr><th>Person Visited</th><td>{{ visitor.person_visited_name }}</td></tr>
+  </table>
+  <form method="post" class="actions">
+    {% csrf_token %}
+    <button class="btn btn-gold" type="submit">Record Current Time as Exit</button>
+    <a class="btn btn-light" href="{% url 'visitor:visitor_detail' visitor.pk %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

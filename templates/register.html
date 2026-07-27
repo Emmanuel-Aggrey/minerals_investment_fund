@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Register Visitor | MIIF Visitor Management{% endblock %}
+{% block content %}
+<h2>Register Visitor</h2>
+
+<section class="notice" style="margin-bottom: 22px;">
+  <strong>MIIF Privacy Notice</strong>
+  <p style="margin-top: 8px;">Visitor information is collected for access control, safety, audit, and compliance purposes under Ghana's Data Protection Act, 2012 (Act 843). Ghana Card PIN details are used only for verification during registration and are not stored in visitor records or reports.</p>
+</section>
+
+<form class="card" method="post">
+  {% csrf_token %}
+  <div class="form-grid">
+    <div>
+      <label for="full_name">Full Name</label>
+      <input id="full_name" name="full_name" value="{{ data.full_name }}" minlength="3" required>
+    </div>
+    <div>
+      <label for="phone">Phone Number</label>
+      <input id="phone" name="phone" value="{{ data.phone }}" pattern="[0-9+() -]{7,20}" required>
+    </div>
+    <div>
+      <label for="email">Email Address</label>
+      <input id="email" type="email" name="email" value="{{ data.email }}">
+    </div>
+    <div>
+      <label>Ghana Card PIN</label>
+      <div style="display: grid; grid-template-columns: 70px 1fr 70px; gap: 8px;">
+        <input value="GHA-" disabled>
+        <input name="ghana_card_middle" maxlength="9" minlength="9" placeholder="XXXXXXXXX">
+        <input name="ghana_card_suffix" maxlength="1" minlength="1" placeholder="X">
+      </div>
+      <p class="muted" style="margin-top: 6px;">PIN is verified at reception and not stored.</p>
+    </div>
+    <div>
+      <label for="staff_to_visit">Staff to Visit</label>
+      <select id="staff_to_visit" name="staff_to_visit">
+        <option value="">Select MIIF staff</option>
+        {% for staff in staff_members %}
+        <option value="{{ staff.pk }}" data-department="{{ staff.department_id|default:'' }}" {% if data.staff_to_visit == staff.pk|stringformat:"s" %}selected{% endif %}>{{ staff.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="department">Department</label>
+      <select id="department" name="department">
+        <option value="">Select department</option>
+        {% for department in departments %}
+        <option value="{{ department.pk }}" {% if data.department == department.pk|stringformat:"s" %}selected{% endif %}>{{ department.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field-full">
+      <label for="person_to_visit">Person to Visit</label>
+      <input id="person_to_visit" name="person_to_visit" value="{{ data.person_to_visit }}" minlength="2" placeholder="Use this only when the person is not listed as staff">
+    </div>
+    <div>
+      <label for="purpose">Purpose of Visit</label>
+      <select id="purpose" name="purpose" required>
+        <option value="">Select purpose</option>
+        {% for value, label in purposes %}
+        <option value="{{ value }}" {% if data.purpose == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="expected_duration">Expected Duration</label>
+      <select id="expected_duration" name="expected_duration">
+        <option value="">Select duration</option>
+        {% for value, label in durations %}
+        <option value="{{ value }}" {% if data.expected_duration == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field-full">
+      <label for="notes">Additional Notes</label>
+      <textarea id="notes" name="notes" maxlength="255">{{ data.notes }}</textarea>
+    </div>
+    <div class="field-full">
+      <label style="display: flex; gap: 10px; align-items: flex-start;">
+        <input type="checkbox" name="consent_given" style="width: auto; margin-top: 3px;" required>
+        <span>I confirm the visitor has read the MIIF Privacy Notice and consents to data processing.</span>
+      </label>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-gold" type="submit">Submit Registration</button>
+    <a class="btn btn-light" href="{% url 'visitor:dashboard' %}">Cancel</a>
+  </div>
+</form>
+<script>
+  const staffSelect = document.getElementById('staff_to_visit');
+  const personInput = document.getElementById('person_to_visit');
+  const departmentSelect = document.getElementById('department');
+
+  function syncVisitTarget() {
+    const selectedOption = staffSelect.options[staffSelect.selectedIndex];
+    const departmentId = selectedOption ? selectedOption.dataset.department : '';
+    const hasStaff = Boolean(staffSelect.value);
+    const hasManualPerson = Boolean(personInput.value.trim());
+
+    if (hasStaff) {
+      personInput.value = '';
+      personInput.disabled = true;
+      personInput.required = false;
+      if (departmentId) {
+        departmentSelect.value = departmentId;
+      }
+      departmentSelect.disabled = true;
+    } else {
+      personInput.disabled = false;
+      personInput.required = true;
+      departmentSelect.disabled = false;
+    }
+
+    if (hasManualPerson && !hasStaff) {
+      staffSelect.value = '';
+    }
+  }
+
+  staffSelect.addEventListener('change', syncVisitTarget);
+  personInput.addEventListener('input', () => {
+    if (personInput.value.trim()) {
+      staffSelect.value = '';
+    }
+    syncVisitTarget();
+  });
+  syncVisitTarget();
+</script>
+{% endblock %}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}MIIF Visitor Management{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C9A84C; --gold-light: #EDD98A; --gold-dark: #8B6914;
+    --ink: #1A1A1A; --surface: #F6F4EF; --white: #FFFFFF;
+    --muted: #6B6B6B; --line: #E6E0D2; --error: #C0392B; --success: #1A7A4A;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--ink); font-size: 15px; }
+  header { background: var(--ink); color: var(--white); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  header h1 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--gold); }
+  header span { font-size: 13px; color: #bbb; }
+  nav { background: #2a2a2a; padding: 0 32px; display: flex; gap: 4px; flex-wrap: wrap; }
+  nav a { color: #ddd; text-decoration: none; padding: 11px 16px; font-size: 13px; display: block; }
+  nav a:hover { color: var(--gold); }
+  main { max-width: 1180px; margin: 30px auto; padding: 0 24px; }
+  h2 { font-size: 26px; margin-bottom: 16px; }
+  h3 { font-size: 17px; margin-bottom: 14px; }
+  .card { background: var(--white); border-radius: 8px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 22px; }
+  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat { background: var(--white); border-left: 4px solid var(--gold); border-radius: 8px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .stat strong { display: block; font-size: 28px; margin-bottom: 4px; }
+  .stat span, .muted { color: var(--muted); font-size: 13px; }
+  .btn { display: inline-block; padding: 10px 18px; border-radius: 6px; border: 0; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 700; text-decoration: none; }
+  .btn-gold { background: var(--gold); color: var(--ink); }
+  .btn-dark { background: var(--ink); color: var(--white); }
+  .btn-light { background: #EFE8D8; color: var(--ink); }
+  .btn-sm { padding: 7px 11px; font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 11px 10px; vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; color: var(--muted); letter-spacing: .02em; }
+  label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 7px; }
+  input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 10px 11px; font: inherit; background: var(--white); }
+  textarea { min-height: 90px; resize: vertical; }
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .field-full { grid-column: 1 / -1; }
+  .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
+  .messages { margin-bottom: 16px; }
+  .msg { padding: 10px 16px; border-radius: 6px; margin-bottom: 8px; font-size: 14px; }
+  .msg.error { background: #fdecea; color: var(--error); border-left: 4px solid var(--error); }
+  .msg.success { background: #e8f5ee; color: var(--success); border-left: 4px solid var(--success); }
+  .msg.info { background: #eef4fb; color: #1f5f8b; border-left: 4px solid #1f5f8b; }
+  .badge { display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 700; background: #EFE8D8; }
+  .badge.in { background: #E8F5EE; color: var(--success); }
+  .badge.out { background: #F0F0F0; color: #555; }
+  .notice { background: #FFFAEA; border: 1px solid #E7D184; border-radius: 8px; padding: 16px; color: #4C3F16; }
+  @media (max-width: 820px) { .grid, .grid.two, .form-grid { grid-template-columns: 1fr; } header, nav { padding-left: 18px; padding-right: 18px; } main { padding: 0 16px; } table { display: block; overflow-x: auto; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>MIIF</h1>
+    <span>Visitor Management System</span>
+  </div>
+  {% if request.user.is_authenticated %}
+  <div style="display:flex; align-items:center; gap:12px;">
+    <span>{{ request.user.full_name }}</span>
+
+
+    <form method="post" action="{% url 'accounts:logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-light btn-sm">Sign Out</button>
+    </form>
+  </div>
+  {% else %}
+  <a href="{% url 'accounts:login' %}" class="btn btn-light btn-sm">Sign In</a>
+  {% endif %}
+</header>
+<nav>
+  {% if app_permissions.can_view_dashboard %}<a href="{% url 'visitor:dashboard' %}">Dashboard</a>{% endif %}
+  {% if app_permissions.can_register_visit %}<a href="{% url 'visitor:register_visitor' %}">Register Visitor</a>{% endif %}
+  {% if app_permissions.can_view_reports %}<a href="{% url 'visitor:reports' %}">Reports</a>{% endif %}
+  {% if app_permissions.can_access_admin and request.user.is_staff %}<a href="/admin/">Admin</a>{% endif %}
+</nav>
+<main>
+  {% if messages %}
+  <div class="messages">
+    {% for msg in messages %}
+    <div class="msg {{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

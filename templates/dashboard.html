@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | MIIF Visitor Management{% endblock %}
+{% block content %}
+<div class="actions" style="justify-content: space-between; margin-top: 0;">
+  <h2>Dashboard</h2>
+  {% if app_permissions.can_register_visit %}
+  <a class="btn btn-gold" href="{% url 'visitor:register_visitor' %}">Register Visitor</a>
+  {% endif %}
+</div>
+
+<section class="grid">
+  <div class="stat"><strong>{{ total_today }}</strong><span>Visits today</span></div>
+  <div class="stat"><strong>{{ total_month }}</strong><span>Visits this month</span></div>
+  <div class="stat"><strong>{{ checked_in }}</strong><span>Currently checked in</span></div>
+  <div class="stat"><strong>{{ checked_out }}</strong><span>Checked out today</span></div>
+</section>
+
+{% if is_admin_view %}
+<section class="grid two" style="margin-top: 22px;">
+  <div class="card">
+    <h3>Visits By Purpose</h3>
+    <table>
+      {% for item in purpose_breakdown %}
+      <tr><td>{{ item.purpose }}</td><td><strong>{{ item.total }}</strong></td></tr>
+      {% empty %}<tr><td class="muted">No visits recorded this month.</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div class="card">
+    <h3>Visits By Department</h3>
+    <table>
+      {% for item in department_breakdown %}
+      <tr><td>{{ item.department__name|default:"N/A" }}</td><td><strong>{{ item.total }}</strong></td></tr>
+      {% empty %}<tr><td class="muted">No visits recorded this month.</td></tr>{% endfor %}
+    </table>
+    {% if most_active %}
+    <p class="muted" style="margin-top: 12px;">Most active officer: <strong>{% if most_active.registered_by__first_name or most_active.registered_by__last_name %}{{ most_active.registered_by__first_name }} {{ most_active.registered_by__last_name }}{% else %}{{ most_active.registered_by__email|default:"Unassigned" }}{% endif %}</strong> ({{ most_active.total }})</p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<section class="card" style="margin-top: 22px;">
+  <div class="actions" style="justify-content: space-between; margin-top: 0;">
+    <h3>Recent Registrations</h3>
+    {% if app_permissions.can_view_reports %}<a class="btn btn-light btn-sm" href="{% url 'visitor:reports' %}">View Reports</a>{% endif %}
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Reference</th><th>Visitor</th><th>Person Visited</th><th>Purpose</th><th>Entry</th><th>Status</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for visitor in recent %}
+      <tr>
+        <td>{{ visitor.reference_number }}</td>
+        <td>{{ visitor.full_name }}</td>
+        <td>{{ visitor.person_visited_name }}</td>
+        <td>{{ visitor.purpose }}</td>
+        <td>{{ visitor.entry_time|date:"Y-m-d H:i" }}</td>
+        <td>{% if visitor.exit_time %}<span class="badge out">Checked out</span>{% else %}<span class="badge in">Checked in</span>{% endif %}</td>
+        <td><a class="btn btn-dark btn-sm" href="{% url 'visitor:visitor_detail' visitor.pk %}">Open</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="muted">No visitor records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIIF — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #EDD98A;
+    --gold-dark: #8B6914;
+    --ink: #1A1A1A;
+    --surface: #F6F4EF;
+    --white: #FFFFFF;
+    --error: #C0392B;
+    --muted: #666;
+    --border: #E0DDD6;
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .top-bar {
+    background: var(--ink);
+    padding: 0 40px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .top-bar .logo-text {
+    font-family: 'DM Serif Display', serif;
+    color: var(--gold);
+    font-size: 20px;
+    letter-spacing: .5px;
+  }
+  .top-bar .logo-divider {
+    width: 1px;
+    height: 20px;
+    background: #444;
+  }
+  .top-bar .logo-sub {
+    color: #aaa;
+    font-size: 12px;
+    letter-spacing: .3px;
+  }
+  .page {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+  .card {
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: 0 2px 24px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04);
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+  }
+  .card-header {
+    background: var(--ink);
+    padding: 28px 36px 24px;
+    text-align: center;
+  }
+  .card-header .shield {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(201,168,76,.12);
+    border: 1.5px solid rgba(201,168,76,.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+  }
+  .card-header .shield svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--gold);
+  }
+  .card-header h1 {
+    font-family: 'DM Serif Display', serif;
+    color: var(--white);
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .card-header p {
+    color: #888;
+    font-size: 13px;
+  }
+  .card-body {
+    padding: 32px 36px 36px;
+  }
+  .error-banner {
+    background: #fdecea;
+    border: 1px solid #f5c6c6;
+    border-radius: 8px;
+    padding: 11px 14px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--error);
+  }
+  .error-banner svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    fill: var(--error);
+  }
+  .field {
+    margin-bottom: 18px;
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    height: 44px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--white);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,.15);
+  }
+  .field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .field-row label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+  .show-pw {
+    font-size: 12px;
+    color: var(--gold-dark);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .show-pw svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--gold-dark);
+    fill: none;
+    stroke-width: 1.8;
+  }
+  .btn-login {
+    width: 100%;
+    height: 48px;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background .15s, transform .1s;
+    letter-spacing: .2px;
+  }
+  .btn-login:hover { background: var(--gold-light); }
+  .btn-login:active { transform: scale(.99); }
+  .footer-note {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .footer-note a {
+    color: var(--gold-dark);
+    text-decoration: none;
+  }
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: #aaa;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="logo-text">MIIF</span>
+  <div class="logo-divider"></div>
+  <span class="logo-sub">Minerals Income Investment Fund</span>
+</div>
+
+<div class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="shield">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V6L12 2zm-1 13l-3-3 1.4-1.4 1.6 1.6 4.6-4.6L17 9l-6 6z"/>
+        </svg>
+      </div>
+      <h1>Visitor Management</h1>
+      <p>Sign in to your account to continue</p>
+    </div>
+
+    <div class="card-body">
+      {% if error %}
+      <div class="error-banner">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'accounts:login' %}">
+        {% csrf_token %}
+        {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="email" autofocus required>
+        </div>
+
+        <div class="field">
+          <div class="field-row">
+            <label for="password">Password</label>
+            <span class="show-pw" onclick="togglePw()">
+              <svg id="pw-eye" viewBox="0 0 24 24"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span id="pw-eye-label">Show</span>
+            </span>
+          </div>
+          <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" class="btn-login">Sign In</button>
+      </form>
+
+      <p class="footer-note">
+        Authorised personnel only.<br>
+        Having trouble? Contact your system administrator.
+      </p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  &copy; {% now "Y" %} Minerals Income Investment Fund &middot; Confidential
+</footer>
+
+<script>
+function togglePw() {
+  var inp = document.getElementById('password');
+  var lbl = document.getElementById('pw-eye-label');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    lbl.textContent = 'Hide';
+  } else {
+    inp.type = 'password';
+    lbl.textContent = 'Show';
+  }
+}
+</script>
+</body>
+</html>

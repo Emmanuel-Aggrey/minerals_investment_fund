@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Visitor Detail | MIIF Visitor Management{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="actions" style="justify-content: space-between; margin-top: 0;">
+    <h2>{{ visitor.full_name }}</h2>
+    {% if visitor.exit_time %}<span class="badge out">Checked out</span>{% else %}<span class="badge in">Checked in</span>{% endif %}
+  </div>
+  <table>
+    <tr><th>Reference No.</th><td>{{ visitor.reference_number }}</td></tr>
+    <tr><th>Phone</th><td>{{ visitor.phone }}</td></tr>
+    <tr><th>Email</th><td>{{ visitor.email|default:"N/A" }}</td></tr>
+    <tr><th>Person Visited</th><td>{{ visitor.person_visited_name }}</td></tr>
+    <tr><th>Visit Target Type</th><td>{% if visitor.staff_to_visit %}Staff{% else %}Manual entry{% endif %}</td></tr>
+    <tr><th>Department</th><td>{{ visitor.department_name }}</td></tr>
+    <tr><th>Purpose</th><td>{{ visitor.purpose }}</td></tr>
+    <tr><th>Expected Duration</th><td>{{ visitor.expected_duration|default:"N/A" }}</td></tr>
+    <tr><th>Notes</th><td>{{ visitor.notes|default:"N/A" }}</td></tr>
+    <tr><th>Entry Time</th><td>{{ visitor.entry_time|date:"Y-m-d H:i" }}</td></tr>
+    <tr><th>Exit Time</th><td>{{ visitor.exit_time|date:"Y-m-d H:i"|default:"Still checked in" }}</td></tr>
+    <tr><th>Total Duration</th><td>{{ visitor.duration|default:"In progress" }}</td></tr>
+    <tr><th>Registered By</th><td>{% if visitor.registered_by %}{{ visitor.registered_by.full_name }}{% else %}Unassigned{% endif %}</td></tr>
+    <tr><th>Data Purge Date</th><td>{{ visitor.purge_date|date:"Y-m-d" }}</td></tr>
+    <tr><th>Consent</th><td>{% if visitor.consent_given %}Granted{% else %}Not granted{% endif %}</td></tr>
+  </table>
+  <div class="actions">
+    {% if not visitor.exit_time and app_permissions.can_register_visit %}<a class="btn btn-gold" href="{% url 'visitor:record_exit' visitor.pk %}">Record Exit</a>{% endif %}
+    {% if app_permissions.can_view_reports %}<a class="btn btn-light" href="{% url 'visitor:reports' %}">Back to Reports</a>{% endif %}
+  </div>
+</section>
+{% endblock %}
