@@ -5,9 +5,10 @@ django-bootstrap5==26.2
 django-environ==0.13.0
 django-import-export==4.4.1
 django-unfold==0.94.0
-#mysqlclient==2.2.8
-pymysql
-pillow
+pillow==12.3.0
+PyMySQL==1.2.0
 sqlparse==0.5.5
 tablib==3.9.0
+tzdata==2026.3
+waitress==3.0.2
 whitenoise==6.12.0
